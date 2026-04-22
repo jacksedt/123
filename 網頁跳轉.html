@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的自定義導航站</title>
+    <style>
+        /* 基礎樣式重置 */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 50px 20px;
+            margin: 0;
+        }
+
+        h1 { color: #333; margin-bottom: 30px; }
+
+        /* 搜尋框樣式 */
+        .search-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 50px;
+        }
+
+        .search-box {
+            display: flex;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .search-box button {
+            padding: 0 25px;
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .search-box button:hover { background-color: #357ae8; }
+
+        /* 按鈕面板樣式 */
+        .nav-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            text-decoration: none;
+            color: #555;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .nav-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+            color: #4285F4;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .nav-item span { font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1>探索世界</h1>
+
+    <div class="search-container">
+        <form action="https://www.google.com/search" method="GET" class="search-box">
+            <input type="text" name="q" placeholder="輸入關鍵字並按 Enter 搜尋..." required>
+            <button type="submit">搜尋</button>
+        </form>
+    </div>
+
+    <div class="nav-container">
+        <a href="https://www.youtube.com" target="_blank" class="nav-item">
+            <span>YouTube</span>
+        </a>
+        <a href="https://gemini.google.com/app" target="_blank" class="nav-item">
+            <span>Gemini</span>
+        </a>
+        <a href="https://www.doubao.com/chat/?channel=google_sem&source=dbweb_google_sem_pinp_hx_pc_01&campaignid=23368565972&adgroupid=189521744839&keywordid=%E8%B1%86%E5%8C%85&aid=6408438311&cid=1223056945&ad_platform_id=google_offline_lead&gad_source=1&gad_campaignid=23368565972&gbraid=0AAAAA-pec8MKmX01_wyo8eVyF5_i4pjPK&gclid=CjwKCAjwspPOBhB9EiwATFbi5LgpggEIYNPJm1PLbiLVpWWg2vxCem4rsf42AgxW9GzNuxPdE3ZOIRoChWMQAvD_BwE" target="_blank" class="nav-item">
+            <span>豆包</span>
+        </a>
+        <a href="https://www.deepseek.com/" target="_blank" class="nav-item">
+            <span>deepseek</span>
+        </a>
+        <a href="" target="_blank" class="nav-item">
+            <span></span>
+        </a>
+        <a href="" target="_blank" class="nav-item">
+            <span></span>
+        </a>
+        <a href="" target="_blank" class="nav-item">
+            <span></span>
+        </a>
+        <a href="" target="_blank" class="nav-item">
+            <span></span>
+        </a>
+        <a href="" target="_blank" class="nav-item">
+            <span></span>
+        </a>
+        <a href="" target="_blank" class="nav-item">
+            <span></span>
+        </a>
+        <a href="" target="_blank" class="nav-item">
+            <span></span>
+        </a>
+
+
+
+        <a href="" target="_blank" class="nav-item">
+            <span></span>
+        </a>
+        
+        </div>
+
+</body>
+</html>

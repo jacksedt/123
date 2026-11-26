@@ -18,11 +18,42 @@
 
         h1 { color: #333; margin-bottom: 30px; }
 
+        /* 新增：左上角分類切換按鈕 */
+        .top-left-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            padding: 10px 18px;
+            background-color: #ffffff;
+            color: #333;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+            z-index: 100;
+        }
+
+        .top-left-btn:hover {
+            background-color: #4285F4;
+            color: white;
+            border-color: #4285F4;
+            transform: translateY(-2px);
+        }
+
+        .top-left-btn.active {
+            background-color: #4285F4;
+            color: white;
+            border-color: #4285F4;
+        }
+
         /* 搜尋框樣式 */
         .search-container {
             width: 100%;
             max-width: 600px;
-            margin-bottom: 50px;
+            margin-bottom: 20px; /* 微調間距以容納第二個搜尋框 */
         }
 
         .search-box {
@@ -30,6 +61,7 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             border-radius: 30px;
             overflow: hidden;
+            background: white;
         }
 
         .search-box input {
@@ -52,6 +84,30 @@
 
         .search-box button:hover { background-color: #357ae8; }
 
+        /* 新增：站內連結搜尋框微調 */
+        .local-search-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 45px;
+        }
+
+        .local-search-box {
+            display: flex;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+            border-radius: 25px;
+            overflow: hidden;
+            background: white;
+            border: 1px solid #e0e0e0;
+        }
+
+        .local-search-box input {
+            flex: 1;
+            padding: 12px 25px;
+            border: none;
+            outline: none;
+            font-size: 15px;
+        }
+
         /* 按鈕面板樣式 */
         .nav-container {
             display: grid;
@@ -61,7 +117,34 @@
             max-width: 800px;
         }
 
+        /* 分類模式下的容器樣式 */
+        .nav-container.grouped-mode {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .category-section {
+            width: 100%;
+        }
+
+        .category-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #4285F4;
+            margin-bottom: 15px;
+            padding-left: 10px;
+            border-left: 4px solid #4285F4;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 20px;
+        }
+
         .nav-item {
+            position: relative; /* 為了定位懸停標籤 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -73,6 +156,7 @@
             color: #555;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
             transition: transform 0.2s, box-shadow 0.2s;
+            text-align: center;
         }
 
         .nav-item:hover {
@@ -81,97 +165,216 @@
             color: #4285F4;
         }
 
+        /* 新增：滑鼠懸停顯示標籤的氣泡樣式 */
+        .nav-item[data-tag]:not([data-tag=""])::after {
+            content: attr(data-tag);
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background-color: rgba(51, 51, 51, 0.9);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s, transform 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+
+        .nav-item[data-tag]:not([data-tag=""]):hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
         .nav-item i {
             font-size: 24px;
             margin-bottom: 10px;
         }
 
         .nav-item span { font-weight: bold; }
+
+        /* 隱藏空白佔位符，以免影響搜尋和分類（若想保留空白格子可移除此行） */
+        .nav-item[href=""] {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
+    <!-- 要求2：左上角分類按鈕 -->
+    <button id="groupToggleBtn" class="top-left-btn" onclick="toggleGroupView()">按標籤分類</button>
+
     <h1>探索世界</h1>
 
+    <!-- 原有的 Google 搜尋框 -->
     <div class="search-container">
         <form action="https://www.google.com/search" method="GET" class="search-box">
-            <input type="text" name="q" placeholder="輸入關鍵字並按 Enter 搜尋..." required>
+            <input type="text" name="q" placeholder="Google 搜尋：輸入關鍵字並按 Enter..." required>
             <button type="submit">搜尋</button>
         </form>
     </div>
 
-    <div class="nav-container">
-        <a href="https://eclass.keangpeng.edu.mo/templates/" target="_blank" class="nav-item">
+    <!-- 要求3：站內網頁連結搜尋框 -->
+    <div class="local-search-container">
+        <div class="local-search-box">
+            <input type="text" id="localSearchInput" placeholder="🔍 篩選下方網頁連結（可搜名稱或標籤，如：Gemini、AI）..." oninput="filterLinks()">
+        </div>
+    </div>
+
+    <!-- 要求1：給每個網頁加上 data-tag 標籤 -->
+    <div class="nav-container" id="navContainer">
+        <a href="https://eclass.keangpeng.edu.mo/templates/" target="_blank" class="nav-item" data-tag="學習">
             <span>eclass</span>
         </a>
-        <a href="https://www.youtube.com" target="_blank" class="nav-item">
+        <a href="https://www.youtube.com" target="_blank" class="nav-item" data-tag="影片">
             <span>YouTube</span>
         </a>
-        <a href="https://gemini.google.com/app" target="_blank" class="nav-item">
+        <a href="https://gemini.google.com/app" target="_blank" class="nav-item" data-tag="ai">
             <span>Gemini</span>
         </a>
-        <a href="https://www.doubao.com/chat/?channel=google_sem&source=dbweb_google_sem_pinp_hx_pc_01&campaignid=23368565972&adgroupid=189521744839&keywordid=%E8%B1%86%E5%8C%85&aid=6408438311&cid=1223056945&ad_platform_id=google_offline_lead&gad_source=1&gad_campaignid=23368565972&gbraid=0AAAAA-pec8MKmX01_wyo8eVyF5_i4pjPK&gclid=CjwKCAjwspPOBhB9EiwATFbi5LgpggEIYNPJm1PLbiLVpWWg2vxCem4rsf42AgxW9GzNuxPdE3ZOIRoChWMQAvD_BwE" target="_blank" class="nav-item">
+        <a href="https://www.doubao.com/chat/?channel=google_sem&source=dbweb_google_sem_pinp_hx_pc_01&campaignid=23368565972&adgroupid=189521744839&keywordid=%E8%B1%86%E5%8C%85&aid=6408438311&cid=1223056945&ad_platform_id=google_offline_lead&gad_source=1&gad_campaignid=23368565972&gbraid=0AAAAA-pec8MKmX01_wyo8eVyF5_i4pjPK&gclid=CjwKCAjwspPOBhB9EiwATFbi5LgpggEIYNPJm1PLbiLVpWWg2vxCem4rsf42AgxW9GzNuxPdE3ZOIRoChWMQAvD_BwE" target="_blank" class="nav-item" data-tag="ai">
             <span>豆包</span>
         </a>
-        <a href="https://www.deepseek.com/" target="_blank" class="nav-item">
+        <a href="https://www.deepseek.com/" target="_blank" class="nav-item" data-tag="ai">
             <span>deepseek</span>
         </a>
-        <a href="https://chatgpt.com/" target="_blank" class="nav-item">
+        <a href="https://chatgpt.com/" target="_blank" class="nav-item" data-tag="ai">
             <span>ChatGPT</span>
         </a>
-        <a href="https://books.xijinping.one/lovers" target="_blank" class="nav-item">
+        <a href="https://books.xijinping.one/lovers" target="_blank" class="nav-item" data-tag="小說">
             <span>維尼與他的情人們</span>
         </a>
-        <a href="https://noiz.ai/tts/creation" target="_blank" class="nav-item">
+        <a href="https://noiz.ai/tts/creation" target="_blank" class="nav-item" data-tag="ai語音">
             <span>noiz</span>
         </a>
-        <a href="https://fish.audio/zh-CN/m/c526cf49e86745f7b25447862979ab77/" target="_blank" class="nav-item">
+        <a href="https://fish.audio/zh-CN/m/c526cf49e86745f7b25447862979ab77/" target="_blank" class="nav-item" data-tag="ai語音">
             <span>維尼聲音ai</span>
         </a>
-        <a href="https://www.douyin.com/" target="_blank" class="nav-item">
+        <a href="https://www.douyin.com/" target="_blank" class="nav-item" data-tag="影片">
             <span>抖音</span>
         </a>
-        <a href="https://www.langou123.com/category/pgame/hoi4/" target="_blank" class="nav-item">
+        <a href="https://www.langou123.com/category/pgame/hoi4/" target="_blank" class="nav-item" data-tag="遊戲資源">
             <span>hoi4資源網</span>
         </a>
-        <a href="https://translate.google.com/?sl=en&tl=zh-CN&op=translate" target="_blank" class="nav-item">
+        <a href="https://translate.google.com/?sl=en&tl=zh-CN&op=translate" target="_blank" class="nav-item" data-tag="實用工具">
             <span>google翻譯</span>
         </a>
-        <a href="https://github.com/" target="_blank" class="nav-item">
+        <a href="https://github.com/" target="_blank" class="nav-item" data-tag="編程">
             <span>GitHub</span>
         </a>
-        <a href="https://www.youtube.com/" target="_blank" class="nav-item">
-            <span>YouTube</span>
-        </a>
-        <a href="https://eclass.keangpeng.edu.mo/eclass40/src/tool/pdfjs_v2/web/viewer.html?file=%2Feclass40%2Ffiles%2Fc114%2Ffileupload%2FeContent%2FE_5%2F2026-09-16_16-28-35%2FopenCV%E8%88%87AI%E5%BD%B1%E5%83%8F%E8%BE%A8%E8%AD%98-%E6%9B%B8%E6%9C%AC%28%E9%83%A8%E4%BB%BD%29v2.pdf" target="_blank" class="nav-item">
+        <a href="https://eclass.keangpeng.edu.mo/eclass40/src/tool/pdfjs_v2/web/viewer.html?file=%2Feclass40%2Ffiles%2Fc114%2Ffileupload%2FeContent%2FE_5%2F2026-09-16_16-28-35%2FopenCV%E8%88%87AI%E5%BD%B1%E5%83%8F%E8%BE%A8%E8%AD%98-%E6%9B%B8%E6%9C%AC%28%E9%83%A8%E4%BB%BD%29v2.pdf" target="_blank" class="nav-item" data-tag="教程">
             <span>open cv教程</span>
         </a>
-        <a href="https://www.bilibili.com/" target="_blank" class="nav-item">
+        <a href="https://www.bilibili.com/" target="_blank" class="nav-item" data-tag="影片">
             <span>bilibili</span>
         </a>
         
-        <a href="" target="_blank" class="nav-item">
-            <span></span>
+        <!-- 預留的空白卡片（未來要新增時，填入 href、名稱和 data-tag 即可） -->
+        <a href="https://www.remove.bg/zh" target="_blank" class="nav-item" data-tag="實用工具">
+            <span>去背景</span>
         </a>
-        <a href="" target="_blank" class="nav-item">
-            <span></span>
-        </a>
-        <a href="" target="_blank" class="nav-item">
-            <span></span>
-        </a>
-        <a href="" target="_blank" class="nav-item">
-            <span></span>
-        </a>
-        <a href="" target="_blank" class="nav-item">
-            <span></span>
-        </a>
-        <a href="" target="_blank" class="nav-item">
-            <span></span>
-        </a>
-        <a href="" target="_blank" class="nav-item">
-            <span></span>
+        <a href="" target="_blank" class="nav-item" data-tag=""><span></span></a>
+        <a href="" target="_blank" class="nav-item" data-tag=""><span></span></a>
+        <a href="" target="_blank" class="nav-item" data-tag=""><span></span></a>
+        <a href="" target="_blank" class="nav-item" data-tag=""><span></span></a>
+        <a href="" target="_blank" class="nav-item" data-tag=""><span></span></a>
+        <a href="" target="_blank" class="nav-item" data-tag=""><span></span></a>
+    </div>
 
-        </div>
+    <script>
+        const navContainer = document.getElementById('navContainer');
+        const groupToggleBtn = document.getElementById('groupToggleBtn');
+        const localSearchInput = document.getElementById('localSearchInput');
+        
+        // 保存原始所有有效的網頁卡片順序
+        const originalItems = Array.from(navContainer.querySelectorAll('.nav-item')).filter(item => {
+            return item.getAttribute('href') !== "" && item.innerText.trim() !== "";
+        });
 
+        let isGrouped = false;
+
+        // 功能 2：按標籤分類 / 恢復預設
+        function toggleGroupView() {
+            isGrouped = !isGrouped;
+            navContainer.innerHTML = ''; // 清空目前容器
+
+            if (isGrouped) {
+                groupToggleBtn.textContent = '恢復預設排序';
+                groupToggleBtn.classList.add('active');
+                navContainer.classList.add('grouped-mode');
+
+                // 按 data-tag 分組
+                const groups = {};
+                originalItems.forEach(item => {
+                    const tag = item.getAttribute('data-tag') || '未分類';
+                    if (!groups[tag]) {
+                        groups[tag] = [];
+                    }
+                    groups[tag].push(item);
+                });
+
+                // 渲染每個分類區塊
+                for (const [tag, items] of Object.entries(groups)) {
+                    const section = document.createElement('div');
+                    section.className = 'category-section';
+
+                    const title = document.createElement('div');
+                    title.className = 'category-title';
+                    title.textContent = tag;
+
+                    const grid = document.createElement('div');
+                    grid.className = 'category-grid';
+
+                    items.forEach(item => grid.appendChild(item));
+
+                    section.appendChild(title);
+                    section.appendChild(grid);
+                    navContainer.appendChild(section);
+                }
+            } else {
+                groupToggleBtn.textContent = '按標籤分類';
+                groupToggleBtn.classList.remove('active');
+                navContainer.classList.remove('grouped-mode');
+
+                // 恢復原本的網格排序
+                originalItems.forEach(item => navContainer.appendChild(item));
+            }
+
+            // 切換視圖後保持當前的搜尋過濾狀態
+            filterLinks();
+        }
+
+        // 功能 3：站內連結即時搜尋
+        function filterLinks() {
+            const keyword = localSearchInput.value.trim().toLowerCase();
+
+            originalItems.forEach(item => {
+                const name = item.innerText.trim().toLowerCase();
+                const tag = (item.getAttribute('data-tag') || '').toLowerCase();
+
+                // 只要網頁名稱或標籤包含關鍵字就顯示，否則隱藏
+                if (name.includes(keyword) || tag.includes(keyword)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+
+            // 如果目前處於「按標籤分類」模式，隱藏沒有任何符合結果的分類標題
+            if (isGrouped) {
+                const sections = navContainer.querySelectorAll('.category-section');
+                sections.forEach(section => {
+                    const visibleItems = Array.from(section.querySelectorAll('.nav-item')).filter(
+                        item => item.style.display !== 'none'
+                    );
+                    section.style.display = visibleItems.length > 0 ? 'block' : 'none';
+                });
+            }
+        }
+    </script>
 </body>
 </html>
